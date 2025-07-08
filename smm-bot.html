@@ -18,6 +18,7 @@
       max-width: 80%;
       font-size: 14px;
       animation: fadeInUp 0.3s ease forwards;
+      word-wrap: break-word;
     }
 
     .chat-bubble.bot {
@@ -31,6 +32,7 @@
       color: #fff;
       align-self: flex-end;
       text-align: right;
+      margin-left: auto;
     }
 
     @keyframes fadeInUp {
@@ -69,59 +71,25 @@
       height: 100%;
       padding: 10px;
       box-sizing: border-box;
-    }
-
-    #chatlog {
-      flex: 1;
       overflow-y: auto;
-      margin-bottom: 10px;
-      padding-right: 6px;
-      display: flex;
-      flex-direction: column;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+      scroll-behavior: smooth;
     }
 
-    #chatlog::-webkit-scrollbar {
+    #chatbox::-webkit-scrollbar {
       display: none;
     }
 
-    .message-container {
-      display: flex;
-      justify-content: flex-start;
-      width: 100%;
-      margin: 8px 0;
-    }
-
-    .message-container.user {
-      justify-content: flex-end;
-    }
-
-    .chat-bubble {
-      padding: 10px 14px;
-      border-radius: 12px;
-      max-width: 80%;
-      font-size: 14px;
-      animation: fadeInUp 0.3s ease forwards;
-    }
-
-    .chat-bubble.bot {
-      background-color: #f0f0f0;
-      color: #000;
-    }
-
-    .chat-bubble.user {
-      background-color: #d32f2f;
-      color: #fff;
-      text-align: right;
-    }
-
-    #chat-options {
+    .chat-block {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      margin-bottom: 10px;
+      margin: 10px 0;
+    }
+
+    .bot-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-right: 8px;
     }
 
     .chat-options-button {
@@ -132,17 +100,18 @@
       padding: 8px 16px;
       font-size: 14px;
       cursor: pointer;
+      margin: 3px 0;
+      align-self: flex-end;
     }
     .chat-options-button:hover {
       background-color: #b92424;
     }
 
-#chat-input-container {
-  display: none; /* Already hidden by default */
-  border-top: 1px solid #ccc;
-  padding: 10px 0 0;
-}
-
+    #chat-input-container {
+      display: none;
+      border-top: 1px solid #ccc;
+      padding: 10px;
+    }
 
     #chat-input {
       display: flex;
@@ -210,46 +179,7 @@
       cursor: pointer;
       z-index: 10000;
     }
-
-    #chat-greeting {
-      position: fixed;
-      bottom: 90px;
-      right: 30px;
-      background-color: #d32f2f;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    #chat-greeting.show {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-    #chat-greeting img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  object-fit: cover;
-}
-    #close-greeting {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .bot-message-wrapper {
+        .bot-message-wrapper {
       display: flex;
       align-items: flex-end;
       margin-bottom: 8px;
@@ -264,33 +194,37 @@
     .bot-message-wrapper.last .bot-avatar {
       display: block;
     }
+    .bot-avatar {
+  display: none;
+}
+.bot-message-wrapper.last .bot-avatar {
+  display: block;
+}
+
   </style>
 </head>
 <body>
-
 <div id="chat-widget">
-  <div id="chatbox">
-    <div id="chatlog"></div>
-    <div id="chat-options"></div>
-    <div id="chat-input-container">
-      <div id="chat-input">
-        <input type="text" id="userinput" placeholder="Type your message here..." />
-        <button onclick="sendMessage()" id="sendBtn">
-          <img src="https://www.idti.in/wp-content/uploads/2025/06/send-message.png" alt="Send" />
-        </button>
-      </div>
+  <div id="chatbox"></div>
+  <div id="chat-input-container">
+    <div id="chat-input">
+      <input type="text" id="userinput" placeholder="Type your message here..." />
+      <button onclick="sendMessage()" id="sendBtn">
+        <img src="https://www.idti.in/wp-content/uploads/2025/06/send-message.png" alt="Send" />
+      </button>
     </div>
   </div>
 </div>
 
-<div id="chat-down-arrow" onclick="toggleChat()">
-  <span>&#x25BC;</span>
+<!-- Chat Greeting Popup -->
+<div id="chat-greeting" style="position: fixed; bottom: 90px; right: 30px; background-color: #d32f2f; color: white; padding: 10px 16px; border-radius: 20px; font-size: 14px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; display: flex; align-items: center; gap: 8px;">
+  <img src="smm.png" alt="Chat Icon" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ccc; object-fit: cover;" />
+  <span>Hi, how can I help you today?</span>
+  <button id="close-greeting" onclick="closeGreeting()" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer;">×</button>
 </div>
 
-<div id="chat-greeting">
-  <img src="smm.png" alt="Chat Icon" />
-  <span>Hi, how can I help you today?</span>
-  <button id="close-greeting" onclick="closeGreeting()">×</button>
+<div id="chat-down-arrow" onclick="toggleChat()">
+  <span>&#x25BC;</span>
 </div>
 
 <div id="chat-toggle" onclick="toggleChat()">
@@ -301,158 +235,125 @@
 let chatStage = 0;
 
 function scrollChatToBottom() {
-  const log = document.getElementById("chatlog");
-  log.scrollTop = log.scrollHeight;
+  const box = document.getElementById("chatbox");
+  box.scrollTop = box.scrollHeight;
 }
 
-function addBotMessage(text) {
-  const log = document.getElementById("chatlog");
-  const prevLast = log.querySelector(".bot-message-wrapper.last");
+function addBotMessagesWithOptions(messages, options) {
+  const chatbox = document.getElementById("chatbox");
+
+  // Remove previous .last message
+  const prevLast = chatbox.querySelector(".bot-message-wrapper.last");
   if (prevLast) prevLast.classList.remove("last");
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "bot-message-wrapper last message-container";
+  let delay = 0;
 
-  const avatar = document.createElement("img");
-  avatar.className = "bot-avatar";
-  avatar.src = "smm.png";
+  messages.forEach((text, index) => {
+    setTimeout(() => {
+      // Create wrapper for each message with avatar and bubble
+      const wrapper = document.createElement("div");
+      wrapper.className = "bot-message-wrapper message-container";
+      if (index === messages.length - 1) wrapper.classList.add("last");
 
-  const msgDiv = document.createElement("div");
-  msgDiv.className = "chat-bubble bot";
-  msgDiv.textContent = text;
+      // Avatar
+      const avatar = document.createElement("img");
+      avatar.className = "bot-avatar";
+      avatar.src = "smm.png";
+      wrapper.appendChild(avatar);
 
-  wrapper.appendChild(avatar);
-  wrapper.appendChild(msgDiv);
-  log.appendChild(wrapper);
-  scrollChatToBottom();
-}
+      // Message bubble
+      const botMsg = document.createElement("div");
+      botMsg.className = "chat-bubble bot";
+      botMsg.textContent = text;
+      wrapper.appendChild(botMsg);
 
-function addUserMessage(text) {
-  const container = document.createElement("div");
-  container.className = "message-container user";
-  
-  const div = document.createElement("div");
-  div.className = "chat-bubble user";
-  div.textContent = text;
-  
-  container.appendChild(div);
-  document.getElementById("chatlog").appendChild(container);
-  scrollChatToBottom();
-}
+      chatbox.appendChild(wrapper);
+      scrollChatToBottom();
 
-function clearOptions() {
-  document.getElementById("chat-options").innerHTML = "";
-}
+      // After last message, show options after 3 seconds
+      if (index === messages.length - 1 && options?.length > 0) {
+        setTimeout(() => {
+          const optionsRow = document.createElement("div");
+          optionsRow.style.display = "flex";
+          optionsRow.style.flexDirection = "column";
+          optionsRow.style.alignItems = "flex-end";
+          optionsRow.style.marginTop = "6px";
 
-function showOptions(options) {
-  const container = document.getElementById("chat-options");
-  clearOptions();
-  options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.className = "chat-options-button";
-    btn.textContent = option;
-    btn.onclick = () => handleOptionClick(option);
-    container.appendChild(btn);
+          options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "chat-options-button";
+            btn.textContent = opt;
+            btn.onclick = () => handleOptionClick(opt, optionsRow);
+            optionsRow.appendChild(btn);
+          });
+
+          chatbox.appendChild(optionsRow);
+          scrollChatToBottom();
+        }, 3000);
+      }
+    }, delay);
+    delay += 1000;
   });
 }
 
-function showBotMessagesThenOptions(messages, options, delay = 1000) {
-  let index = 0;
-  function showNext() {
-    if (index < messages.length) {
-      addBotMessage(messages[index]);
-      index++;
-      setTimeout(showNext, delay);
-    } else {
-      showOptions(options);
-    }
-  }
-  showNext();
-}
+function handleOptionClick(option, optionsRow) {
+  optionsRow.remove();
+  const chatbox = document.getElementById("chatbox");
 
-function showInitialBotMessages() {
-  if (chatStage !== 0) return;
-  const messages = [
-    "Hi, I'm The SMM Hub : an ROI-focused digital marketing and creative agency based in Mumbai. Let's get started!",
-    "Kindly let us know which services you are looking for"
-  ];
-  const options = ["Social Media Marketing", "Performace Marketing for Ecommerce Brands", "Google / Meta Ads", "Website Design and Development", "Audit - Analyzing your current Marketing Efforts", "Bussiness Consulting & Strategy Meeting", "SEO - Search Engine Optimization", "Branding - Name, Logo, Website Design, Packaging", "Ad Hoc Collaterals", "E-commerce Product Photoshoot", "Other"];
-  showBotMessagesThenOptions(messages, options, 800);
-  chatStage = 1;
-}
-
-function handleOptionClick(option) {
-  addUserMessage(option);
-  clearOptions();
+  // Append user's message
+  const userWrapper = document.createElement("div");
+  userWrapper.className = "chat-block";
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-bubble user";
+  userMsg.textContent = option;
+  userWrapper.appendChild(userMsg);
+  chatbox.appendChild(userWrapper);
 
   document.getElementById("chat-input-container").style.display = "block";
+  scrollChatToBottom();
 
-  switch (option) {
-    case "Courses":
-      showBotMessagesThenOptions(["We offer Paid & Free Digital Marketing Courses."], ["Paid", "Free"]);
-      break;
+  let botText = ["Thanks for your interest! 😊"];
+  if (option === "Paid") botText = ["Our paid courses include mentorship, live projects, and certifications."];
+  else if (option === "Free") botText = ["You can explore our free resources and webinars to get started."];
+  else if (["Schedule Call", "Instant Call"].includes(option)) botText = ["Please share your Full Name, Mobile Number and Email."];
 
-    case "Talk to Counselor":
-      showBotMessagesThenOptions(["You can schedule or initiate a call."], ["Schedule Call", "Instant Call"]);
-      break;
+  setTimeout(() => addBotMessagesWithOptions(botText, []), 500);
 
-    case "Schedule Call":
-    case "Instant Call":
-      addBotMessage("Please share your Full Name, Mobile Number and Email.");
-      break;
-
-    case "Just Exploring":
-      addBotMessage("Feel free to look around! Let us know if you need anything.");
-      break;
-
-    case "Paid":
-      addBotMessage("Our paid courses include mentorship, live projects, and certifications.");
-      break;
-
-    case "Free":
-      addBotMessage("You can explore our free resources and webinars to get started.");
-      break;
-
-    default:
-  addBotMessage("Thanks for your interest! 😊");
-
-  setTimeout(() => {
-    window.location.href = 'thankyou/index.html';
-  }, 5000); 
-  break;
-  }
+  if (option === "Other") setTimeout(() => window.location.href = 'thankyou/index.html', 5000);
 }
-
 
 function sendMessage() {
   const input = document.getElementById("userinput");
   const message = input.value.trim();
   if (!message) return;
-  addUserMessage(message);
   input.value = '';
-  addBotMessage("Thanks for your message! 😊");
-  setTimeout(() => {
-    window.location.href = 'thankyou/index.html'; 
-  }, 5000); 
+  const wrapper = document.createElement("div");
+  wrapper.className = "chat-block";
+  const botMsg = document.createElement("div");
+  botMsg.className = "chat-bubble bot";
+  botMsg.textContent = "Thanks for your message! 😊";
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-bubble user";
+  userMsg.textContent = message;
+  wrapper.appendChild(botMsg);
+  wrapper.appendChild(userMsg);
+  document.getElementById("chatbox").appendChild(wrapper);
+  scrollChatToBottom();
   document.getElementById("chat-input-container").style.display = "none";
-}
-
-function closeGreeting() {
-  document.getElementById("chat-greeting").classList.remove("show");
+  setTimeout(() => window.location.href = 'thankyou/index.html', 5000);
 }
 
 function toggleChat() {
   const widget = document.getElementById("chat-widget");
   const toggle = document.getElementById("chat-toggle");
   const arrow = document.getElementById("chat-down-arrow");
-  const greeting = document.getElementById("chat-greeting");
   const isOpen = widget.classList.contains("open");
 
   if (!isOpen) {
     widget.classList.add("open");
     toggle.style.display = "none";
     arrow.style.display = "flex";
-    greeting.classList.remove("show");
+    closeGreeting();
     showInitialBotMessages();
   } else {
     widget.classList.remove("open");
@@ -463,7 +364,35 @@ function toggleChat() {
   }
 }
 
-window.addEventListener("load", function () {
+function showInitialBotMessages() {
+  if (chatStage !== 0) return;
+  const messages = [
+    "Hi, I'm The SMM Hub — an ROI-focused digital marketing and creative agency based in Mumbai.",
+    "Let's get started! Kindly let us know which services you are looking for"
+  ];
+  const options = [
+    "Social Media Marketing",
+    "Performace Marketing for Ecommerce Brands",
+    "Google / Meta Ads",
+    "Website Design and Development",
+    "Audit - Analyzing your current Marketing Efforts",
+    "Bussiness Consulting & Strategy Meeting",
+    "SEO - Search Engine Optimization",
+    "Branding - Name, Logo, Website Design, Packaging",
+    "Ad Hoc Collaterals",
+    "E-commerce Product Photoshoot",
+    "Other"
+  ];
+  addBotMessagesWithOptions(messages, options);
+  chatStage = 1;
+}
+
+function closeGreeting() {
+  document.getElementById("chat-greeting").style.opacity = '0';
+  document.getElementById("chat-greeting").style.pointerEvents = 'none';
+}
+
+window.addEventListener("load", () => {
   document.getElementById("userinput").addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -471,11 +400,19 @@ window.addEventListener("load", function () {
     }
   });
 
-  const greeting = document.getElementById("chat-greeting");
-  setTimeout(() => greeting.classList.add("show"), 1000);
-  setTimeout(() => greeting.classList.remove("show"), 8000);
+  setTimeout(() => {
+    const greeting = document.getElementById("chat-greeting");
+    greeting.style.opacity = '1';
+    greeting.style.pointerEvents = 'auto';
+    greeting.style.transform = 'translateY(0)';
+  }, 1000);
+
+  setTimeout(() => {
+    const greeting = document.getElementById("chat-greeting");
+    greeting.style.opacity = '0';
+    greeting.style.pointerEvents = 'none';
+  }, 8000);
 });
 </script>
-
 </body>
 </html>
