@@ -388,10 +388,10 @@ function handleOptionClick(option, optionsRow) {
   scrollChatToBottom();
 
 
-  const backendUrl = "http://127.0.0.1:5000/name"; // Change to your deployed URL if needed
+  const backend = "http://127.0.0.1:5000"; // Change to your deployed URL if needed
 
   function sendNameToBackend(userName) {
-    fetch(backendUrl, {
+    fetch(`${backend}/name`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -401,50 +401,315 @@ function handleOptionClick(option, optionsRow) {
     .then(response => response.json())
     .then(data => {
       console.log("Backend response:", data);
-      // Proceed with next bot message or flow
     })
     .catch(error => {
       console.error("Error sending name:", error);
     });
   }
+  function sendPhoneToBackend(userPhone) {
+    fetch(`${backend}/phone`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ phone: userPhone })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Backend response:", data);
+    })
+    .catch(error => {
+      console.error("Error sending name:", error);
+    });
+  }
+  function sendEmailToBackend(userEmail) {
+  fetch(`${backend}/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email: userEmail }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Email sent successfully:", data);
+    })
+    .catch((error) => {
+      console.error("Error sending email:", error);
+    });
+}
+function sendPincodeToBackend(userPincode) {
+  fetch(`${backend}/pincode`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ pincode: userPincode }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Pincode sent successfully:", data);
+    })
+    .catch((error) => {
+      console.error("Error sending pincode:", error);
+    });
+}
+function sendStartTimeToBackend(startChoice){
+  fetch(`${backend}/start-time`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({start_choice: startChoice}),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log("Start choice sent successfully;", data);
+  })
+  .catch((error) => {
+    console.log("Error sending start choice:", error);
+  });
+}
 
   let botText = ["Thanks for your interest! 😊"];
 
   if (option === "Social Media Marketing") {
-    botTexts = ["What is Your Total Monthly Marketing Budget?"];
-    options = ["100,000 - 1,50,000", "1,50,000 - 3,00,000", "3,00,000+"];
-    setTimeout(() => {
-      addBotMessagesWithOptions(botTexts, options);
-      
-      // Add click handlers for budget options
-      const chatbox = document.getElementById("chatbox");
-      chatbox.addEventListener("click", function(e) {
-        if (e.target.classList.contains("chat-options-button")) {
-          const selectedBudget = e.target.textContent;
-          if (["100,000 - 1,50,000", "1,50,000 - 3,00,000", "3,00,000+"].includes(selectedBudget)) {
-            setTimeout(() => {
-    botTexts = ["Please provide your Full Name:"];
+  const botTexts = ["What is Your Total Monthly Marketing Budget?"];
+  const options = ["100,000 - 1,50,000", "1,50,000 - 3,00,000", "3,00,000+"];
+
+  setTimeout(() => {
+    addBotMessagesWithOptions(botTexts, options);
+
+    // Add click handler once for budget selection
+    const chatbox = document.getElementById("chatbox");
+    const budgetHandler = function (e) {
+      if (e.target.classList.contains("chat-options-button")) {
+        const selectedBudget = e.target.textContent;
+        if (options.includes(selectedBudget)) {
+          // Remove this handler after use
+          chatbox.removeEventListener("click", budgetHandler);
+
+          // Ask for name
+          setTimeout(() => {
+            const askNameTexts = ["Please provide your Full Name:"];
+            document.getElementById("chat-input-container").style.display = "block";
+            addBotMessagesWithOptions(askNameTexts, []);
+
+            // Setup name submission
+            const inputField = document.getElementById("userinput");
+            const submitButton = document.getElementById("sendBtn");
+
+            // Clear any existing listeners
+            const newInputField = inputField.cloneNode(true);
+            inputField.parentNode.replaceChild(newInputField, inputField);
+
+            const newSubmitButton = submitButton.cloneNode(true);
+            submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+
+function handleSendMessage() {
+  const userInput = newInputField.value.trim();
+  if (userInput === "") return;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "chat-block";
+
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-bubble user";
+  userMsg.textContent = userInput;
+
+  wrapper.appendChild(userMsg);
+  document.getElementById("chatbox").appendChild(wrapper);
+
+  sendNameToBackend(userInput);
+  newInputField.value = "";
+  document.getElementById("chat-input-container").style.display = "none";
+  addBotMessagesWithOptions(["Thanks, " + userInput + "!"], []);
+
+  // 👇 Ask for phone number next
+  setTimeout(() => {
+    const phonePrompt = ["Kindly share your phone number:"];
     document.getElementById("chat-input-container").style.display = "block";
-    addBotMessagesWithOptions(botTexts, []);
-    
-    // Add event listener to capture input
-    const submitButton = document.getElementById("sendBtn");
-    submitButton.onclick = function () {
-      const userInput = document.getElementById("userinput").value.trim();
-      if (userInput !== "") {
-        sendNameToBackend(userInput);
-        document.getElementById("userinput").value = ""; // clear input
-        document.getElementById("chat-input-container").style.display = "none";
-        // Optionally show confirmation or move to next step
-        addBotMessagesWithOptions(["Thanks, " + userInput + "!", "hi"], []);
+    addBotMessagesWithOptions(phonePrompt, []);
+
+    // Replace input and button again to avoid duplicate listeners
+    const inputPhoneField = newInputField.cloneNode(true);
+    newInputField.parentNode.replaceChild(inputPhoneField, newInputField);
+
+    const newSubmitPhoneButton = newSubmitButton.cloneNode(true);
+    newSubmitButton.parentNode.replaceChild(newSubmitPhoneButton, newSubmitButton);
+
+    function handlePhoneSubmit() {
+      const userPhone = inputPhoneField.value.trim();
+      if (userPhone === "") return;
+
+      const phoneWrapper = document.createElement("div");
+      phoneWrapper.className = "chat-block";
+
+      const phoneMsg = document.createElement("div");
+      phoneMsg.className = "chat-bubble user";
+      phoneMsg.textContent = userPhone;
+
+      phoneWrapper.appendChild(phoneMsg);
+      document.getElementById("chatbox").appendChild(phoneWrapper);
+
+      sendPhoneToBackend(userPhone);
+      inputPhoneField.value = "";
+      document.getElementById("chat-input-container").style.display = "none";
+
+      addBotMessagesWithOptions(["Thanks for sharing your number!"], []);
+      
+      setTimeout(() => {
+  const emailPrompt = ["Please enter your Email address:"];
+  document.getElementById("chat-input-container").style.display = "block";
+  addBotMessagesWithOptions(emailPrompt, []);
+
+  // Replace input and button to remove old listeners
+  const inputEmailField = inputPhoneField.cloneNode(true);
+  inputPhoneField.parentNode.replaceChild(inputEmailField, inputPhoneField);
+
+  const newSubmitEmailButton = newSubmitPhoneButton.cloneNode(true);
+  newSubmitPhoneButton.parentNode.replaceChild(newSubmitEmailButton, newSubmitPhoneButton);
+
+  function handleEmailSubmit() {
+    const userEmail = inputEmailField.value.trim();
+    if (userEmail === "") return;
+
+    const emailWrapper = document.createElement("div");
+    emailWrapper.className = "chat-block";
+
+    const emailMsg = document.createElement("div");
+    emailMsg.className = "chat-bubble user";
+    emailMsg.textContent = userEmail;
+
+    emailWrapper.appendChild(emailMsg);
+    document.getElementById("chatbox").appendChild(emailWrapper);
+
+    sendEmailToBackend(userEmail);
+    inputEmailField.value = "";
+    document.getElementById("chat-input-container").style.display = "none";
+
+    addBotMessagesWithOptions(["Thank you! We'll get in touch with you shortly."], []);
+
+    setTimeout(() => {
+  const pincodePrompt = ["What is your area/pincode?"];
+  document.getElementById("chat-input-container").style.display = "block";
+  addBotMessagesWithOptions(pincodePrompt, []);
+
+  // Replace input and button again
+  const inputPincodeField = inputEmailField.cloneNode(true);
+  inputEmailField.parentNode.replaceChild(inputPincodeField, inputEmailField);
+
+  const newSubmitPincodeButton = newSubmitEmailButton.cloneNode(true);
+  newSubmitEmailButton.parentNode.replaceChild(newSubmitPincodeButton, newSubmitEmailButton);
+
+  function handlePincodeSubmit() {
+    const userPincode = inputPincodeField.value.trim();
+    if (userPincode === "") return;
+
+    const pinWrapper = document.createElement("div");
+    pinWrapper.className = "chat-block";
+
+    const pinMsg = document.createElement("div");
+    pinMsg.className = "chat-bubble user";
+    pinMsg.textContent = userPincode;
+
+    pinWrapper.appendChild(pinMsg);
+    document.getElementById("chatbox").appendChild(pinWrapper);
+
+    sendPincodeToBackend(userPincode);
+    inputPincodeField.value = "";
+    document.getElementById("chat-input-container").style.display = "none";
+
+    addBotMessagesWithOptions(["Thank you! We've received all your details."], []);
+
+    setTimeout(() => {
+  const startPrompt = ["How soon do you want to start?"];
+  const startOptions = ["Immediate", "15 Days", "1 Month"];
+  addBotMessagesWithOptions(startPrompt, startOptions);
+
+  const chatbox = document.getElementById("chatbox");
+
+  const startHandler = function (e) {
+    if (e.target.classList.contains("chat-options-button")) {
+      const selectedStart = e.target.textContent;
+      if (startOptions.includes(selectedStart)) {
+        chatbox.removeEventListener("click", startHandler);
+
+        // Show user message
+        const wrapper = document.createElement("div");
+        wrapper.className = "chat-block";
+
+        const userMsg = document.createElement("div");
+        userMsg.className = "chat-bubble user";
+        userMsg.textContent = selectedStart;
+
+        // wrapper.appendChild(userMsg);
+        document.getElementById("chatbox").appendChild(wrapper);
+
+        sendStartTimeToBackend(selectedStart);
+
+        addBotMessagesWithOptions(["Thanks! You're all set. Our team will reach out shortly. 😊"], []);
+      }
+    }
+  };
+
+  chatbox.addEventListener("click", startHandler);
+}, 1000);
+
+  }
+
+  newSubmitPincodeButton.onclick = handlePincodeSubmit;
+
+  inputPincodeField.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handlePincodeSubmit();
+    }
+  });
+}, 1000);
+
+  }
+
+  newSubmitEmailButton.onclick = handleEmailSubmit;
+
+  inputEmailField.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleEmailSubmit();
+    }
+  });
+}, 1000);
+
+    }
+
+    newSubmitPhoneButton.onclick = handlePhoneSubmit;
+
+    inputPhoneField.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handlePhoneSubmit();
+      }
+    });
+  }, 1000); // small delay after name confirmation
+}
+            // Button click
+            newSubmitButton.onclick = handleSendMessage;
+
+            // Enter key
+            newInputField.addEventListener("keydown", function (e) {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            });
+          }, 500);
+        }
       }
     };
+
+    chatbox.addEventListener("click", budgetHandler);
   }, 500);
-          }
-        }
-      }, {once: true}); // Remove listener after first use
-    }, 500);
-  }
+}
 
   else if (option === "Free") botText = ["You can explore our free resources and webinars to get started."];
   else if (["Schedule Call", "Instant Call"].includes(option)) botText = ["Please share your Full Name, Mobile Number and Email."];
@@ -453,6 +718,27 @@ function handleOptionClick(option, optionsRow) {
 
   if (option === "Other") setTimeout(() => window.location.href = 'thankyou/index.html', 5000);
 }
+
+// function handleSendMessage() {
+//    const submitButton = document.getElementById("sendBtn");
+//   const inputField = document.getElementById("userinput");
+
+//     const userInput = inputField.value.trim();
+//     if (userInput === "") return;
+
+//     const wrapper = document.createElement("div");
+//     wrapper.className = "chat-block";
+
+//     const userMsg = document.createElement("div");
+//     userMsg.className = "chat-bubble user";
+//     userMsg.textContent = userInput;
+
+//     wrapper.appendChild(userMsg);
+//     document.getElementById("chatbox").appendChild(wrapper);
+
+//     sendNameToBackend(userInput);
+//     inputField.value = ""; // clear input
+//   }
 
 function sendMessage() {
   const input = document.getElementById("userinput");
