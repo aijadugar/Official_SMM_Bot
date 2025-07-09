@@ -5,203 +5,253 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Classic ChatBot</title>
   <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+  body {
+    font-family: "Segoe UI Black", "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-    .chat-bubble {
-      padding: 10px 14px;
-      margin: 8px 0;
-      border-radius: 12px;
-      max-width: 80%;
-      font-size: 14px;
-      animation: fadeInUp 0.3s ease forwards;
-      word-wrap: break-word;
-    }
+  .chat-bubble {
+    padding: 10px 14px;
+    margin: 8px 0;
+    border-radius: 12px;
+    max-width: 80%;
+    font-size: 15px;
+    animation: fadeInUp 0.3s ease forwards;
+    word-wrap: break-word;
+  }
 
-    .chat-bubble.bot {
-      background-color: #f0f0f0;
-      color: #000;
-      align-self: flex-start;
-    }
+  .chat-bubble.bot {
+    background: linear-gradient(to right, #e0e0e0, #f8f8f8);
+    color: #000;
+    align-self: flex-start;
+  }
 
-    .chat-bubble.user {
-      background-color: #d32f2f;
-      color: #fff;
-      align-self: flex-end;
-      text-align: right;
-      margin-left: auto;
-    }
+  .chat-bubble.user {
+    background: linear-gradient(to right, #d32f2f, #f44336);
+    color: #fff;
+    align-self: flex-end;
+    text-align: right;
+    margin-left: auto;
+  }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
+  #chat-widget {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 450px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to top left, #ffffff, #f4f4f4);
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+    z-index: 9999;
+  }
+
+  #chat-widget.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  #chatbox {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+
+  #chatbox::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chat-block {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+  }
+
+  .bot-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 8px;
+    display: none;
+  }
+
+  .bot-message-wrapper {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 8px;
+  }
+
+  .bot-message-wrapper.last .bot-avatar {
+    display: block;
+  }
+
+  .chat-options-button {
+    background: linear-gradient(to right, #d32f2f, #e53935);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 3px 0;
+    align-self: flex-end;
+  }
+
+  .chat-options-button:hover {
+    background: linear-gradient(to right, #b92424, #d32f2f);
+  }
+
+  #chat-input-container {
+    display: none;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+  }
+
+  #chat-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  #userinput {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+
+  #sendBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  #sendBtn img {
+    width: 24px;
+    height: 24px;
+  }
+
+  #chat-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+  }
+
+  #chat-toggle img {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  #chat-down-arrow {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #ff3c3c;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10000;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
     #chat-widget {
-      position: fixed;
-      bottom: 100px;
-      right: 30px;
-      width: 450px;
-      height: 500px;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(20px);
-      transition: all 0.4s ease;
-      z-index: 9999;
-    }
-
-    #chat-widget.open {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-
-    #chatbox {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-    }
-
-    #chatbox::-webkit-scrollbar {
-      display: none;
-    }
-
-    .chat-block {
-      display: flex;
-      flex-direction: column;
-      margin: 10px 0;
-    }
-
-    .bot-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      margin-right: 8px;
-    }
-
-    .chat-options-button {
-      background-color: #d32f2f;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 16px;
-      font-size: 14px;
-      cursor: pointer;
-      margin: 3px 0;
-      align-self: flex-end;
-    }
-    .chat-options-button:hover {
-      background-color: #b92424;
-    }
-
-    #chat-input-container {
-      display: none;
-      border-top: 1px solid #ccc;
-      padding: 10px;
-    }
-
-    #chat-input {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    #userinput {
-      flex: 1;
-      padding: 8px;
-      border-radius: 6px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-
-    #sendBtn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-    }
-
-    #sendBtn img {
-      width: 24px;
-      height: 24px;
+      width: 90%;
+      height: 80%;
+      bottom: 80px;
+      right: 5%;
     }
 
     #chat-toggle {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      background: white;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 9999;
+      right: 20px;
+      bottom: 20px;
     }
 
-    #chat-toggle img {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      object-fit: cover;
+    .chat-options-button {
+      font-size: 13px;
+      padding: 6px 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .chat-bubble {
+      font-size: 14px;
     }
 
-    #chat-down-arrow {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      background-color: #ff3c3c;
-      color: white;
-      font-size: 30px;
-      font-weight: bold;
-      border-radius: 50%;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10000;
+    #chat-widget {
+      width: 95%;
+      height: 75%;
+      bottom: 70px;
+      right: 2.5%;
     }
-        .bot-message-wrapper {
-      display: flex;
-      align-items: flex-end;
-      margin-bottom: 8px;
+
+    #userinput {
+      font-size: 14px;
     }
-    .bot-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      margin-right: 8px;
-      display: none;
+
+    .chat-options-button {
+      font-size: 14px;
+      padding: 5px 12px;
     }
-    .bot-message-wrapper.last .bot-avatar {
-      display: block;
-    }
-    .bot-avatar {
-  display: none;
-}
-.bot-message-wrapper.last .bot-avatar {
-  display: block;
+  }
+
+/*  fonts you can try
+body {
+  font-family: "Poppins", sans-serif;
 }
 
-  </style>
+.chat-bubble {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+}
+
+.chat-options-button {
+  font-family: "Oswald", sans-serif;
+  font-weight: 700;
+}
+
+*/
+
+</style>
 </head>
 <body>
 <div id="chat-widget">
@@ -334,15 +384,72 @@ function handleOptionClick(option, optionsRow) {
   userWrapper.appendChild(userMsg);
   chatbox.appendChild(userWrapper);
 
-  document.getElementById("chat-input-container").style.display = "block";
+  // document.getElementById("chat-input-container").style.display = "block";
   scrollChatToBottom();
 
+
+  const backendUrl = "http://127.0.0.1:5000/name"; // Change to your deployed URL if needed
+
+  function sendNameToBackend(userName) {
+    fetch(backendUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name: userName })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Backend response:", data);
+      // Proceed with next bot message or flow
+    })
+    .catch(error => {
+      console.error("Error sending name:", error);
+    });
+  }
+
   let botText = ["Thanks for your interest! 😊"];
-  if (option === "Paid") botText = ["Our paid courses include mentorship, live projects, and certifications."];
+
+  if (option === "Social Media Marketing") {
+    botTexts = ["What is Your Total Monthly Marketing Budget?"];
+    options = ["100,000 - 1,50,000", "1,50,000 - 3,00,000", "3,00,000+"];
+    setTimeout(() => {
+      addBotMessagesWithOptions(botTexts, options);
+      
+      // Add click handlers for budget options
+      const chatbox = document.getElementById("chatbox");
+      chatbox.addEventListener("click", function(e) {
+        if (e.target.classList.contains("chat-options-button")) {
+          const selectedBudget = e.target.textContent;
+          if (["100,000 - 1,50,000", "1,50,000 - 3,00,000", "3,00,000+"].includes(selectedBudget)) {
+            setTimeout(() => {
+    botTexts = ["Please provide your Full Name:"];
+    document.getElementById("chat-input-container").style.display = "block";
+    addBotMessagesWithOptions(botTexts, []);
+    
+    // Add event listener to capture input
+    const submitButton = document.getElementById("sendBtn");
+    submitButton.onclick = function () {
+      const userInput = document.getElementById("userinput").value.trim();
+      if (userInput !== "") {
+        sendNameToBackend(userInput);
+        document.getElementById("userinput").value = ""; // clear input
+        document.getElementById("chat-input-container").style.display = "none";
+        // Optionally show confirmation or move to next step
+        addBotMessagesWithOptions(["Thanks, " + userInput + "!", "hi"], []);
+      }
+    };
+  }, 500);
+          }
+        }
+      }, {once: true}); // Remove listener after first use
+    }, 500);
+  }
+
   else if (option === "Free") botText = ["You can explore our free resources and webinars to get started."];
   else if (["Schedule Call", "Instant Call"].includes(option)) botText = ["Please share your Full Name, Mobile Number and Email."];
 
-  setTimeout(() => addBotMessagesWithOptions(botText, []), 500);
+  // setTimeout(() => addBotMessagesWithOptions(botText, []), 500);
 
   if (option === "Other") setTimeout(() => window.location.href = 'thankyou/index.html', 5000);
 }
@@ -392,8 +499,8 @@ function toggleChat() {
 function showInitialBotMessages() {
   if (chatStage !== 0) return;
   const messages = [
-    "Hi, I'm The SMM Hub — an ROI-focused digital marketing and creative agency based in Mumbai.",
-    "Let's get started! Kindly let us know which services you are looking for"
+    "Hellow, we are The SMM Hub, an ROI-focused digital marketing and creative agency based in Mumbai.",
+    "Let's get started! Kindly let us know which services you are looking for..."
   ];
   const options = [
     "Social Media Marketing",
@@ -403,8 +510,7 @@ function showInitialBotMessages() {
     "Audit - Analyzing your current Marketing Efforts",
     "Bussiness Consulting & Strategy Meeting",
     "SEO - Search Engine Optimization",
-    "Branding - Name, Logo, Website Design, Packaging",
-    "Ad Hoc Collaterals",
+    "Branding - Name, Logo, Website Design, Packaging, Ad Hoc Collaterals",    
     "E-commerce Product Photoshoot",
     "Other"
   ];
