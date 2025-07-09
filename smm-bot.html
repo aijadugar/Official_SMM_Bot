@@ -244,31 +244,56 @@ function addBotMessagesWithOptions(messages, options) {
 
   // Remove previous .last message
   const prevLast = chatbox.querySelector(".bot-message-wrapper.last");
-  if (prevLast) prevLast.classList.remove("last");
+  if (prevLast) {
+    prevLast.classList.remove("last");
+    // Remove avatar from previous last bot message
+    const prevAvatar = prevLast.querySelector(".bot-avatar");
+    if (prevAvatar) {
+      prevAvatar.remove();
+    }
+  }
 
   let delay = 0;
+  let prevWrapper = null;
 
   messages.forEach((text, index) => {
     setTimeout(() => {
-      // Create wrapper for each message with avatar and bubble
       const wrapper = document.createElement("div");
       wrapper.className = "bot-message-wrapper message-container";
-      if (index === messages.length - 1) wrapper.classList.add("last");
+      
+      // Set last class only on the last message
+      if (index === messages.length - 1) {
+        wrapper.classList.add("last");
+      }
 
-      // Avatar
-      const avatar = document.createElement("img");
-      avatar.className = "bot-avatar";
-      avatar.src = "smm.png";
-      wrapper.appendChild(avatar);
+      // Move avatar from previous wrapper to current wrapper
+      if (prevWrapper) {
+        const prevAvatar = prevWrapper.querySelector(".bot-avatar");
+        if (prevAvatar) {
+          prevAvatar.remove();
+          wrapper.appendChild(prevAvatar);
+        }
+      }
+      
+      // Create avatar for first message
+      if (index === 0) {
+        const avatar = document.createElement("img");
+        avatar.className = "bot-avatar";
+        avatar.src = "smm.png";
+        avatar.style.display = "block";
+        wrapper.appendChild(avatar);
+      }
 
       // Message bubble
       const botMsg = document.createElement("div");
       botMsg.className = "chat-bubble bot";
       botMsg.textContent = text;
       wrapper.appendChild(botMsg);
-
+      
       chatbox.appendChild(wrapper);
       scrollChatToBottom();
+
+      prevWrapper = wrapper;
 
       // After last message, show options after 3 seconds
       if (index === messages.length - 1 && options?.length > 0) {
